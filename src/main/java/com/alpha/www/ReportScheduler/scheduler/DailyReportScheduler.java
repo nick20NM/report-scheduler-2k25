@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.alpha.www.ReportScheduler.model.Patient;
 import com.alpha.www.ReportScheduler.service.CsvReaderService;
+import com.alpha.www.ReportScheduler.service.EmailService;
 
 @Component
 public class DailyReportScheduler {
@@ -16,9 +17,14 @@ public class DailyReportScheduler {
     private static final Logger logger = LoggerFactory.getLogger(DailyReportScheduler.class);
     
     private final CsvReaderService csvReaderService;
+    
+    private final EmailService emailService;
+    
+    List<Patient> patientsGlobal;
 
-    public DailyReportScheduler(CsvReaderService csvReaderService) {
+    public DailyReportScheduler(CsvReaderService csvReaderService, EmailService emailService) {
         this.csvReaderService = csvReaderService;
+        this.emailService = emailService;
     }
 
     // Runs every day at 8:00 AM
@@ -37,6 +43,9 @@ public class DailyReportScheduler {
         logger.info("📥 Reading patient data from CSV...");
 
         List<Patient> patients = csvReaderService.readPatientsFromCsv("patients.csv");
+        patientsGlobal = patients;
+        
+        System.out.println("patientsGlobal = " + patientsGlobal);
 
         logger.info("✅ Total Patients Processed: {}", patients.size());
         for (Patient patient : patients) {
@@ -49,7 +58,18 @@ public class DailyReportScheduler {
 
     private void sendEmails() {
         // Simulate logic
-        logger.info("Emails sent to all doctors.");
+//        logger.info("Emails sent to all doctors.");
+    	
+    	logger.info("📧 Sending email summaries to recipients...");
+
+    	
+        // Example
+        emailService.sendEmail(
+//            "masihnishit@gmail.com",
+            "recipient@example.com",
+            "Daily Patient Report",
+            "The daily patient report has been generated successfully." + patientsGlobal
+        );
     }
 }
 
